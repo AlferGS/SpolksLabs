@@ -64,8 +64,11 @@ def HandleClientRequest(client, request):
 
     if(name_command == "get"):
         if(isFileExist(body)):
+            print("1.1")
             SendStatus(client['socket'], name_command, OK_STATUS)
+            print("1.2")
             Download(client, body)
+            print("1.3")
         else:
             print("File: " + body + " is not exist.")
             SendStatusAndMessage(client['socket'], name_command, SERVER_ERROR, "No such file!")
@@ -114,7 +117,7 @@ def HandleDisconnect(client, command, file_name, progress):
     sys.stdout.flush()
 
 def WaitOK(client):
-    while client['socket'.recv(2).decode('utf-8') != "OK"]:
+    while client['socket'].recv(2).decode('utf-8') != "OK":
         print("wait for OK")
 
 def SendOK(client):
@@ -128,15 +131,22 @@ def SendData(client, data):
 
 def Download(client, file_name):
     file = open(file_name, "rb+") # Открываем файл в режиме (чтения/записи бинарного)
+    print("1.2.1")
     file_size = int(os.path.getsize(file_name))
+    print("1.2.2")
     SendData(client, file_size)
+    print("1.2.3")
     WaitOK(client)
+    print("1.2.4")
 
     waiting_client = SearchByIP(waiting_clients, client['ip'])
+    print("1.2.5")
     if (len(waiting_clients) > 0 and waiting_client != False):
         waiting_clients.remove(waiting_client)
+    print("1.2.6")
 
     data_size_recv = int(GetData(client))
+    print("1.2.7")
 
     if (waiting_client):
         if (waiting_client['file_name'] == file_name and waiting_client['command'] == 'download'):
@@ -145,9 +155,12 @@ def Download(client, file_name):
     else:
         SendData(client, data_size_recv)
 
+    print("1.2.8")
     WaitOK(client)
+    print("1.2.9")
 
     file.seek(data_size_recv, 0)
+    print("1.2.10")
 
     print("Start downloading")
     while (data_size_recv < file_size):
@@ -333,39 +346,3 @@ while True:
                     HandleClientRequest(found_client, request)
             else:
                 ExitClient(found_client)
-
-
-
-
-    # print('Wait connection...')
-    # client, client_info = server_socket.accept()
-    # print(f"New connection from {client_info}!")
-    #
-    # while True:
-    #     print('1.1')
-    #
-    #     #question = input('Do u want to quit (y/n)?: ')
-    #     #if question == 'y': break
-    #
-    #     data_output = ''
-    #     print('1.2')
-    #     data = client.recv(1024)
-    #     print('1.3')
-    #     data_output += data.decode('utf8')
-    #     print('1.4')
-    #     if not data:
-    #         client.close()
-    #         print('Has no data from client')
-    #         break
-    #     elif data.decode('utf8') == 'QUIT_SERVER':
-    #         client.close()
-    #         print('Server is stop his work')
-    #         break
-    #     else:
-    #         print('1.5')
-    #         print(str(data))
-    #         print('1.6')
-    #         client.send('Message is received'.encode('utf8'))
-    #         print('1.7')
-    #
-    # server_socket.close()

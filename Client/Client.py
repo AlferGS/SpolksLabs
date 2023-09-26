@@ -1,3 +1,5 @@
+#var 7
+
 import socket
 import os
 import os.path
@@ -12,7 +14,6 @@ PORT = 1357
 BUFFER_SIZE = 1024
 OOB_RATE = 100
 TIMEOUT = 20
-
 OK_STATUS = 200
 
 
@@ -142,7 +143,7 @@ def GetTime():
     print(GetData())
 
 def Download(file_name, request):
-    size = int(GetData())
+    file_size = int(GetData())
     SendingOK()
     SendingData(0)
     data_size_recv = int(GetData())
@@ -154,13 +155,13 @@ def Download(file_name, request):
 
     time_start = time.time()
     progress_bar = 10
-    while (data_size_recv < size):
+    while (data_size_recv < file_size):
         try:
             data = client.recv(BUFFER_SIZE)
             file.seek(data_size_recv, 0)
             file.write(data)
             data_size_recv += BUFFER_SIZE
-            progress = (data_size_recv / size) * 100
+            progress = (data_size_recv / file_size) * 100
 
             if (progress >= progress_bar):
                 print("Download progress: %d%% " % progress)
@@ -186,11 +187,11 @@ def Download(file_name, request):
             os._exit(1)
 
     file.close()
-    print("\n"+"DOWNLOADING COMPLETE" + file_name )
+    print("\n"+"DOWNLOADING COMPLETE (" + file_name + ")")
     time_end = time.time()
     delta_time = (time_end - time_start)
     print("Total time: %f ms" %delta_time)
-    speed = (size/1024**2)/delta_time*1000
+    speed = (file_size/1024**2)/delta_time*1000
     print("Average speed: %f M/s" % speed)
 
 def Upload(file_name, request):
@@ -238,7 +239,7 @@ def Upload(file_name, request):
             os._exit(1)
 
     f.close()
-    print("\n"+"UPLOADING COMPLETE" + file_name )
+    print("\n"+"UPLOADING COMPLETE (" + file_name + ")")
     time_end = time.time()
     delta_time = (time_end - time_start)
     print("Total time: %f ms" %delta_time)
